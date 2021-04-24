@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js -p $PORT"
   },
   "license": "Hippocratic-2.1",
   "cacheDirectories": [".next/cache"],

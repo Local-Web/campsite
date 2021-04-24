@@ -7,7 +7,7 @@ const { socketsApp } = require("./sockets/app");
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
-const port = dev ? 3000 : 80;
+const port = dev ? 3000 : process.env.PORT;
 
 app.prepare().then(() => {
   const server = createServer((req, res) => {
