@@ -5,12 +5,12 @@ const prepMessage = (message, username = "") => {
   return `{"message": "${message}", "id": "${id}", "username": "${username}"}`;
 };
 
-const sendMessage = (ws, message, username) => {
+const sendSocketMessage = (ws, message, username) => {
   ws.send(prepMessage(message, username));
 };
 
-exports.sendMessage = sendMessage;
+exports.sendSocketMessage = sendSocketMessage;
 
 exports.broadcastMessage = (wss, message, username) => {
-  wss.clients.forEach((client) => exports.sendMessage(client, message, username));
+  wss.clients.forEach((client) => exports.sendSocketMessage(client, message, username));
 };
