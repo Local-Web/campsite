@@ -14,6 +14,10 @@ exports.socketsApp = (server) => {
 
     // Don't love this design: need to find a way of setting the state without bringing in so much of the
     // implementation here.
+    //
+    // This is going to be replaced with a `type` field on the message, which is then
+    // used to .get() the handler from messageTypes. Each messageTypes function is going
+    // to return the new userState.
     const handleMessage = (envelope) => {
       if (envelope.message) {
         broadcastMessage(wss, envelope.message, userState.username);
