@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
-const { broadcastMessage, sendSocketMessage } = require("./messages");
-const { messageTypes } = require("./messageTypes");
-const { messageParser } = require("./messageParser");
+const { sendSocketMessage } = require("./messages/transport");
+const { types } = require("./messages/types");
+const { parser } = require("./messages/parser");
 
 // Here's the new idea: add `messagesTypes` constant as a "dictionary", always pass the user state, 
 // always receive the new user state. It's impure FP, but I think that gets us to where we want to be.
@@ -19,8 +19,8 @@ exports.socketsApp = (server) => {
     // used to .get() the handler from messageTypes. Each messageTypes function is going
     // to return the new userState.
     const handleMessage = (message) => {
-      if (messageTypes.has(message.command)) {
-        state = messageTypes.get(message.command)({message, state});
+      if (types.has(message.command)) {
+        state = types.get(message.command)({message, state});
         // TODO: replace this with the actual fulfillment of the command. Function might get
         // passed back?
         sendSocketMessage(ws, `success: ${message.command} fulfilled!`);
@@ -33,7 +33,7 @@ exports.socketsApp = (server) => {
       let message;
       try {
         console.log("received: %s", raw);
-        message = messageParser(raw);
+        message = parser(raw);
         // TODO: either need to handle invalid messages here or have messageParser raise them
       } catch {
         console.log("Invalid message");
