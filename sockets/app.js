@@ -12,23 +12,6 @@ exports.socketsApp = (server) => {
   wss.on("connection", (ws) => {
     let state = { username: '' };
 
-    // Don't love this design: need to find a way of setting the state without bringing in so much of the
-    // implementation here.
-    //
-    // This is going to be replaced with a `type` field on the message, which is then
-    // used to .get() the handler from messageTypes. Each messageTypes function is going
-    // to return the new userState.
-    const handleMessage = (message) => {
-      if (commands.has(message.command)) {
-        state = commands.get(message.command)({message, state});
-        // TODO: replace this with the actual fulfillment of the command. Function might get
-        // passed back?
-        sendSocketMessage(ws, `success: ${message.command} fulfilled!`);
-      } else {
-        sendSocketMessage(ws, `Sorry, I could not process that command.`);
-      }
-    }
-
     ws.on("message", (raw) => {
       let message;
       try {
@@ -38,7 +21,14 @@ exports.socketsApp = (server) => {
       } catch {
         console.log("Invalid message");
       } finally {
-        handleMessage(message);
+        if (commands.has(message.command)) {
+          state = commands.get(message.command)({message, state});
+          // TODO: replace this with the actual fulfillment of the command. Function might get
+          // passed back?
+          sendSocketMessage(ws, `success: ${message.command} fulfilled!`);
+        } else {
+          sendSocketMessage(ws, `Sorry, I could not process that command.`);
+        }
       }
     });
 
