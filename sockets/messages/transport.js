@@ -1,12 +1,16 @@
-const { v4: uuidv4 } = require("uuid");
+// Trying something: no uuids!
+// const { v4: uuidv4 } = require("uuid");
 
 const prepMessage = (message, username = "") => {
-  const id = uuidv4();
-  return `{"message": "${message}", "id": "${id}", "username": "${username}"}`;
+  if (username && username !== "") {
+    return `${username}: ${message}`;
+  }
+
+  return `${message}`;
 };
 
-const sendSocketMessage = (ws, message, username) => {
-  ws.send(prepMessage(message, username));
+const sendSocketMessage = (ws, message) => {
+  ws.send(prepMessage(message));
 };
 
 exports.sendSocketMessage = sendSocketMessage;
