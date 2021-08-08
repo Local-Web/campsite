@@ -10,8 +10,11 @@ const { parser } = require("./messages/parser");
 exports.socketsApp = (server) => {
   const wss = new WebSocket.Server({ server });
 
-  wss.on("connection", (ws) => {
+  wss.on("connection", (ws, request) => {
     let commandResult, response, state = { loggedIn: false, username: '' };
+
+    // can use request.url to create different rooms?
+    // console.log(request);
 
     // `message` in this block is overloaded, should clarify.
     ws.on("message", (raw) => {
@@ -23,6 +26,8 @@ exports.socketsApp = (server) => {
       } catch {
         console.log("Invalid message");
         sendSocketMessage(ws, responses.get('invalid command').message);
+        // can use this to remove people who do not agree to the TOS
+        // ws.terminate();
       } finally {
         if (message && commands.has(message.command)) {
           commandResult = commands.get(message.command)({message: message.message, state: state});

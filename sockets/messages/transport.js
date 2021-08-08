@@ -1,6 +1,3 @@
-// Trying something: no uuids!
-// const { v4: uuidv4 } = require("uuid");
-
 const prepMessage = (message, username = "") => {
   if (username && username !== "") {
     return `${username}: ${message}`;
