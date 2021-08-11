@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+const { MyNameIs } = require("../parsers/MyNameIs");
 const { Message } = require("../parsers/Message");
 
 let socket;
@@ -28,11 +29,10 @@ export default function Chat() {
       }
 
       let newPeople = [...messages.people];
-      let foundPeople;
-      foundPeople = message.data.match(/^My name is (?<person>.*)/);
+      let foundPeople = MyNameIs(message.data);
 
       if (foundPeople) {
-        newPeople.push(foundPeople.groups.person);
+        newPeople.push(foundPeople);
       }
 
       setMessages({ raw: newRaw, clean: newClean, people: newPeople });
