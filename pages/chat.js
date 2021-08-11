@@ -2,25 +2,34 @@ import { useState, useEffect } from "react";
 const { MyNameIs } = require("../parsers/MyNameIs");
 const { Message } = require("../parsers/Message");
 
+// Set up a socket that doesn't change as the component re-renders
 let socket;
 
 function setupSocket() {
   socket = new WebSocket(`ws://${location.host}`);
 }
 
+// Set up a people Map that doesn't change as the component re-renders
+let people = new Set();
+
 export default function Chat() {
   const [name, setName] = useState();
   const [nameLocked, setNameLocked] = useState(false);
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState({ raw: [], clean: [], people: [] });
+  const [messages, setMessages] = useState({ raw: [], clean: [] });
 
   useEffect(() => {
     if (!socket) setupSocket();
 
+    // This could stand to be cleaned up. There are potentially situations where we will receive a message and won't want to
+    // set or re-render anything.
     socket.onmessage = (message) => {
-      // TODO: see if there's a JS store that will handle this better than setting in-state. (might get memory hoggy)
       let newRaw = [...messages.raw];
       newRaw.push(message.data);
+
+      if (message.data === "A new person has entered" && nameLocked) {
+        identifySelf();
+      }
 
       let newClean = [...messages.clean],
         parsedMessage = Message(message.data);
@@ -28,14 +37,13 @@ export default function Chat() {
         newClean.push(parsedMessage);
       }
 
-      let newPeople = [...messages.people];
-      let foundPeople = MyNameIs(message.data);
+      let foundPerson = MyNameIs(message.data);
 
-      if (foundPeople) {
-        newPeople.push(foundPeople);
+      if (foundPerson) {
+        people.add(foundPerson);
       }
 
-      setMessages({ raw: newRaw, clean: newClean, people: newPeople });
+      setMessages({ raw: newRaw, clean: newClean });
     };
   });
 
@@ -45,11 +53,13 @@ export default function Chat() {
     setText("");
   };
 
-  // For now, we're going to be optimistic here and proceed with the assumption all names will be unique.
-  // In the future, we should have a "new entrant" message to poll for names
+  const identifySelf = () => {
+    socket.send(`My name is ${name}`);
+  };
+
   const enterChat = (e) => {
     e.preventDefault();
-    socket.send(`My name is ${name}`);
+    identifySelf();
     setNameLocked(true);
   };
 
@@ -57,7 +67,7 @@ export default function Chat() {
     <div>
       <h2>People</h2>
       <ul>
-        {messages.people.map((person, i) => (
+        {[...people].map((person, i) => (
           <li key={i}>{person}</li>
         ))}
       </ul>
