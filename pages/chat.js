@@ -1,4 +1,3 @@
-import { div } from "prelude-ls";
 import { useState, useEffect } from "react";
 const { Message } = require("../parsers/Message");
 
@@ -18,7 +17,6 @@ export default function Chat() {
     if (!socket) setupSocket();
 
     socket.onmessage = (message) => {
-      // TODO: this is where we also need to parse out specific messages
       // TODO: see if there's a JS store that will handle this better than setting in-state. (might get memory hoggy)
       let newRaw = [...messages.raw];
       newRaw.push(message.data);
