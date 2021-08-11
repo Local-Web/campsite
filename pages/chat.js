@@ -1,4 +1,6 @@
+import { div } from "prelude-ls";
 import { useState, useEffect } from "react";
+const { Message } = require("../parsers/Message");
 
 let socket;
 
@@ -9,7 +11,8 @@ function setupSocket() {
 export default function Chat() {
   const [name, setName] = useState();
   const [nameLocked, setNameLocked] = useState(false);
-  const [messages, setMessages] = useState({ raw: [], people: [] });
+  const [text, setText] = useState("");
+  const [messages, setMessages] = useState({ raw: [], clean: [], people: [] });
 
   useEffect(() => {
     if (!socket) setupSocket();
@@ -20,6 +23,12 @@ export default function Chat() {
       let newRaw = [...messages.raw];
       newRaw.push(message.data);
 
+      let newClean = [...messages.clean],
+        parsedMessage = Message(message.data);
+      if (parsedMessage) {
+        newClean.push(parsedMessage);
+      }
+
       let newPeople = [...messages.people];
       let foundPeople;
       foundPeople = message.data.match(/^My name is (?<person>.*)/);
@@ -28,9 +37,15 @@ export default function Chat() {
         newPeople.push(foundPeople.groups.person);
       }
 
-      setMessages({ raw: newRaw, people: newPeople });
+      setMessages({ raw: newRaw, clean: newClean, people: newPeople });
     };
   });
+
+  const sendChat = (e) => {
+    e.preventDefault();
+    socket.send(`${name}: ${text}`);
+    setText("");
+  };
 
   // For now, we're going to be optimistic here and proceed with the assumption all names will be unique.
   // In the future, we should have a "new entrant" message to poll for names
@@ -50,7 +65,26 @@ export default function Chat() {
       </ul>
 
       {nameLocked ? (
-        ""
+        <div>
+          <h2>Chat messages</h2>
+          {messages.clean &&
+            messages.clean.map((message, i) => (
+              <p key={i}>
+                {message.name}: {message.text}
+              </p>
+            ))}
+          <form onSubmit={sendChat}>
+            <label>
+              Send message{" "}
+              <input
+                value={text}
+                name="text"
+                onChange={(event) => setText(event.target.value)}
+              />
+            </label>
+            {text.length > 0 ? <button>Set name</button> : ""}
+          </form>
+        </div>
       ) : (
         <div>
           <h2>Enter your name</h2>
