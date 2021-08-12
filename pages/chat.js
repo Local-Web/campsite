@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { LeftChat } from "../parsers/LeftChat";
 const { MyNameIs } = require("../parsers/MyNameIs");
 const { Message } = require("../parsers/Message");
 
@@ -40,7 +41,19 @@ export default function Chat() {
         people.add(foundPerson);
       }
 
+      foundPerson = LeftChat(message.data);
+
+      if (foundPerson) {
+        people.delete(foundPerson);
+      }
+
       setMessages(newMessages);
+    };
+
+    window.addEventListener("beforeunload", leaveChat);
+
+    return () => {
+      window.removeEventListener("beforeunload", leaveChat);
     };
   });
 
@@ -58,6 +71,10 @@ export default function Chat() {
     e.preventDefault();
     identifySelf();
     setNameLocked(true);
+  };
+
+  const leaveChat = () => {
+    socket.send(`${name} has left the chat`);
   };
 
   return (
