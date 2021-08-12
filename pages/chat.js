@@ -90,7 +90,7 @@ export default function Chat() {
                 onChange={(event) => setText(event.target.value)}
               />
             </label>
-            {text.length > 0 ? <button>Send</button> : ""}
+            <button disabled={text.length < 1}>Send</button>
           </form>
         </div>
       ) : (
@@ -104,7 +104,7 @@ export default function Chat() {
                 onChange={(event) => setName(event.target.value)}
               />
             </label>
-            {name && name.length > 0 ? <button>Set name</button> : ""}
+            <button disabled={!name || name.length < 1}>Set name</button>
           </form>
         </div>
       )}
