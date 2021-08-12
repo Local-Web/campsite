@@ -16,7 +16,7 @@ export default function Chat() {
   const [name, setName] = useState();
   const [nameLocked, setNameLocked] = useState(false);
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState({ raw: [], clean: [] });
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (!socket) setupSocket();
@@ -24,17 +24,14 @@ export default function Chat() {
     // This could stand to be cleaned up. There are potentially situations where we will receive a message and won't want to
     // set or re-render anything.
     socket.onmessage = (message) => {
-      let newRaw = [...messages.raw];
-      newRaw.push(message.data);
-
       if (message.data === "A new person has entered" && nameLocked) {
         identifySelf();
       }
 
-      let newClean = [...messages.clean],
+      let newMessages = [...messages],
         parsedMessage = Message(message.data);
       if (parsedMessage) {
-        newClean.push(parsedMessage);
+        newMessages.push(parsedMessage);
       }
 
       let foundPerson = MyNameIs(message.data);
@@ -43,7 +40,7 @@ export default function Chat() {
         people.add(foundPerson);
       }
 
-      setMessages({ raw: newRaw, clean: newClean });
+      setMessages(newMessages);
     };
   });
 
@@ -75,8 +72,8 @@ export default function Chat() {
       {nameLocked ? (
         <div>
           <h2>Chat messages</h2>
-          {messages.clean &&
-            messages.clean.map((message, i) => (
+          {messages &&
+            messages.map((message, i) => (
               <p key={i}>
                 {message.name}: {message.text}
               </p>
