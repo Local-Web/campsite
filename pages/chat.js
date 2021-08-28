@@ -78,23 +78,28 @@ export default function Chat() {
   };
 
   return (
-    <div>
-      <h2>People</h2>
-      <ul>
-        {[...people].map((person, i) => (
-          <li key={i}>{person}</li>
-        ))}
-      </ul>
+    <div className="chat">
+      <div className="people">
+        <h2>People</h2>
+        <ul>
+          {[...people].map((person, i) => (
+            <li key={i}>{person}</li>
+          ))}
+        </ul>
+      </div>
 
       {nameLocked ? (
-        <div>
+        <div className="messages">
           <h2>Chat messages</h2>
-          {messages &&
-            messages.map((message, i) => (
-              <p key={i}>
-                {message.name}: {message.text}
-              </p>
-            ))}
+          <ul>
+            {messages &&
+              messages.map((message, i) => (
+                <li key={i}>
+                  {message.name}: {message.text}
+                </li>
+              ))
+            }
+          </ul>
           <form onSubmit={sendChat}>
             <label>
               Send message{" "}
@@ -108,7 +113,7 @@ export default function Chat() {
           </form>
         </div>
       ) : (
-        <div>
+        <div className="entry">
           <h2>Enter your name</h2>
           <form onSubmit={enterChat}>
             <label>
