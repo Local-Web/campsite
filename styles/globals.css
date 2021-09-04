@@ -12,6 +12,14 @@ body {
   width: 30%;
 }
 
+/* may end up wanting to do a container here and dump the li's */
+.messages ul {
+  height: 80vh;
+  display: flex;
+  overflow-y: scroll;
+  flex-direction: column;
+}
+
 .messages li {
   list-style: none;
   padding: 0.25em;
@@ -20,4 +28,10 @@ body {
   border-style: solid;
   border-color: cornflowerblue;
   border-radius: 0.5em;
+}
+
+.messages form {
+  position: fixed;
+  bottom: 0;
+  height: 7vh;
 }

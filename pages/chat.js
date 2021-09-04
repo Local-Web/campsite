@@ -97,8 +97,7 @@ export default function Chat() {
                 <li key={i}>
                   {message.name}: {message.text}
                 </li>
-              ))
-            }
+              ))}
           </ul>
           <form onSubmit={sendChat}>
             <label>
