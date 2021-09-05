@@ -1,10 +1,10 @@
-const regex = /^My name is (?<person>.*)/;
+const regex = /^My name is (?<person>.*?)\.(?<host> I am the host\.)?/;
 
 exports.MyNameIs = (raw) => {
   let matches = raw.match(regex);
 
   if (matches) {
-    return matches.groups.person;
+    return { name: matches.groups.person, host: !!matches.groups.host };
   }
 
   return false;

@@ -15,6 +15,7 @@ let people = new Set();
 
 export default function Chat() {
   const [name, setName] = useState();
+  const [host, setHost] = useState();
   const [nameLocked, setNameLocked] = useState(false);
   const [text, setText] = useState("");
   const [messages, setMessages] = useState([]);
@@ -38,7 +39,11 @@ export default function Chat() {
       let foundPerson = MyNameIs(message.data);
 
       if (foundPerson) {
-        people.add(foundPerson);
+        people.add(foundPerson.name);
+
+        if (foundPerson.host) {
+          setHost(foundPerson.name);
+        }
       }
 
       foundPerson = LeftChat(message.data);
@@ -64,7 +69,7 @@ export default function Chat() {
   };
 
   const identifySelf = () => {
-    socket.send(`My name is ${name}`);
+    socket.send(`My name is ${name}.`);
   };
 
   const enterChat = (e) => {
@@ -83,7 +88,10 @@ export default function Chat() {
         <h2>People</h2>
         <ul>
           {[...people].map((person, i) => (
-            <li key={i}>{person}</li>
+            <li key={i}>
+              {person}
+              {person === host ? " (host)" : ""}
+            </li>
           ))}
         </ul>
       </div>
